@@ -1,0 +1,5 @@
+\venv
+__pycache__/
+*.pyc
+*.py[cod]
+dashboard_app/__pycache__/

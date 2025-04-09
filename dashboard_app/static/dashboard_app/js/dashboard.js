@@ -19,28 +19,31 @@ $.ajaxSetup({
     }
 });
 
+// Bootstrap Table Ajax Handler
+window.ajaxRequest = function (params) {
+    const url = '/api/clients/';
+    $.get(`${url}?${$.param(params.data)}`).then(function (res) {
+        params.success(res);
+    });
+};
 
-$(document).ready(function() {
-    function loadClients() {
-        $.get('/api/clients/', function(data) {
-            var tableBody = '';
-            data.forEach(function(client) {
-                tableBody += `<tr><td>${client.name}</td><td>${client.primary_number}</td><td>${client.country_code}</td><td>${client.created_at}</td></tr>`;
-            });
-            $('#clientsTable tbody').html(tableBody);
-        });
-    }
+$(document).ready(function () {
+    // Initialize Bootstrap Table (in case it's not auto-init)
+    $('#clientTable').bootstrapTable();
 
-    loadClients();
-
-    $('#clientForm').submit(function(e) {
+    // Handle form submission to add client
+    $('#clientForm').submit(function (e) {
         e.preventDefault();
-        $.post('/clients/add/', $(this).serialize(), function(response) {
+        $.post('/clients/add/', $(this).serialize(), function (response) {
             if (response.status === 'success') {
                 $('#clientModal').modal('hide');
-                loadClients();
                 $('#clientForm')[0].reset();
+                $('#clientTable').bootstrapTable('refresh'); // Refresh table
+            } else {
+                alert('Failed to add client');
             }
+        }).fail(function () {
+            alert('Error submitting form. CSRF token might be missing.');
         });
     });
 });
